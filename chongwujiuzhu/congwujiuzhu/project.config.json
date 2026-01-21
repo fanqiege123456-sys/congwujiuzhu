@@ -1,0 +1,45 @@
+{
+  "description": "流浪萌宠救助小程序",
+  "projectname": "rescue-paws",
+  "appid": "wx71625e3d2b32f53f",
+  "libVersion": "3.12.1",
+  "compileType": "miniprogram",
+  "setting": {
+    "newFeature": true,
+    "es6": true,
+    "enhance": false,
+    "postcss": false,
+    "preloadLocalDependencies": false,
+    "minified": true,
+    "nodeModules": false,
+    "showShadowRootInWxmlPanel": true,
+    "checkInvalidKey": true,
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "useCompilerPlugins": false,
+    "condition": false,
+    "swc": false,
+    "disableSWC": true,
+    "urlCheck": false,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "compileOptions": {},
+  "condition": {},
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "editorSetting": {}
+}
