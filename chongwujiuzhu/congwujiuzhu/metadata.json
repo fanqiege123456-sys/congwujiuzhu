@@ -1,0 +1,9 @@
+{
+  "name": "RescuePaws - Pet Rescue Map",
+  "description": "A community-driven platform to track, report, and rescue stray pets in your area using real-time geolocation.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
