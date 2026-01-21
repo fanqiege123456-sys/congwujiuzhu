@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宠物救助管理后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #ea580c;
+            width: 24px;
+            height: 24px;
+            -webkit-animation: spin 1s linear infinite; /* Safari */
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Toast Animation */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-enter { animation: slideIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
+
+    <!-- Sidebar -->
+    <div class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg z-10 flex flex-col">
+        <div class="p-6 border-b border-gray-100">
+            <h1 class="text-2xl font-bold text-orange-600 flex items-center gap-2">
+                🐾 救助管理
+            </h1>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <button onclick="switchTab('dashboard')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition flex items-center gap-3 font-medium text-gray-600" data-tab="dashboard">
+                📊 数据概览
+            </button>
+            <button onclick="switchTab('pets')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition flex items-center gap-3 font-medium text-gray-600" data-tab="pets">
+                🐶 救助信息
+            </button>
+            <button onclick="switchTab('dailies')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition flex items-center gap-3 font-medium text-gray-600" data-tab="dailies">
+                📝 日常更新
+            </button>
+            <button onclick="switchTab('comments')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition flex items-center gap-3 font-medium text-gray-600" data-tab="comments">
+                💬 评论管理
+            </button>
+            <button onclick="switchTab('users')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition flex items-center gap-3 font-medium text-gray-600" data-tab="users">
+                👥 用户管理
+            </button>
+            <button onclick="switchTab('settings')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-orange-50 hover:text-orange-600 transition flex items-center gap-3 font-medium text-gray-600" data-tab="settings">
+                ⚙️ 系统设置
+            </button>
+        </nav>
+        <div class="p-4 border-t border-gray-100">
+            <div class="flex items-center gap-3 px-4 py-3 mb-2">
+                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-600" id="adminAvatar">A</div>
+                <div class="text-sm font-medium" id="adminName">Admin</div>
+            </div>
+            <button onclick="logout()" class="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 rounded-lg transition">
+                退出登录
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="ml-64 p-8">
+        
+        <!-- Dashboard -->
+        <div id="dashboard" class="tab-content active">
+            <h2 class="text-2xl font-bold mb-6">数据概览</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="text-gray-500 text-sm mb-1">总救助信息</div>
+                    <div class="text-3xl font-bold text-gray-800" id="stat-totalPets">-</div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="text-gray-500 text-sm mb-1">待审核</div>
+                    <div class="text-3xl font-bold text-orange-500" id="stat-pendingAudits">-</div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="text-gray-500 text-sm mb-1">已救助</div>
+                    <div class="text-3xl font-bold text-green-500" id="stat-rescuedPets">-</div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <div class="text-gray-500 text-sm mb-1">注册用户</div>
+                    <div class="text-3xl font-bold text-blue-500" id="stat-totalUsers">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pets Management -->
+        <div id="pets" class="tab-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">救助信息管理</h2>
+                <div class="flex gap-2">
+                    <select id="petFilter" onchange="loadPets()" class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                        <option value="all">全部状态</option>
+                        <option value="PENDING">待审核</option>
+                        <option value="APPROVED">已通过</option>
+                        <option value="REJECTED">已拒绝</option>
+                    </select>
+                    <button onclick="loadPets()" class="bg-white border border-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-50">刷新</button>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-semibold">
+                        <tr>
+                            <th class="px-6 py-4">图片</th>
+                            <th class="px-6 py-4">描述/地点</th>
+                            <th class="px-6 py-4">发布人</th>
+                            <th class="px-6 py-4">状态</th>
+                            <th class="px-6 py-4">审核</th>
+                            <th class="px-6 py-4">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="petsTableBody" class="divide-y divide-gray-100 text-sm">
+                        <!-- Rows injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Dailies Management -->
+        <div id="dailies" class="tab-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">日常更新管理</h2>
+                <button onclick="loadDailies()" class="bg-white border border-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-50">刷新</button>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-semibold">
+                        <tr>
+                            <th class="px-6 py-4">图片</th>
+                            <th class="px-6 py-4">内容</th>
+                            <th class="px-6 py-4">关联救助信息</th>
+                            <th class="px-6 py-4">发布人</th>
+                            <th class="px-6 py-4">时间</th>
+                            <th class="px-6 py-4">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dailiesTableBody" class="divide-y divide-gray-100 text-sm"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Comments Management -->
+        <div id="comments" class="tab-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">评论管理</h2>
+                <button onclick="loadComments()" class="bg-white border border-gray-300 px-4 py-2 rounded-lg text-sm hover:bg-gray-50">刷新</button>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-semibold">
+                        <tr>
+                            <th class="px-6 py-4">评论内容</th>
+                            <th class="px-6 py-4">关联日常</th>
+                            <th class="px-6 py-4">发布人</th>
+                            <th class="px-6 py-4">时间</th>
+                            <th class="px-6 py-4">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="commentsTableBody" class="divide-y divide-gray-100 text-sm"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Users Management -->
+        <div id="users" class="tab-content">
+            <h2 class="text-2xl font-bold mb-6">用户管理</h2>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-semibold">
+                        <tr>
+                            <th class="px-6 py-4">头像</th>
+                            <th class="px-6 py-4">昵称</th>
+                            <th class="px-6 py-4">OpenID</th>
+                            <th class="px-6 py-4">注册时间</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody" class="divide-y divide-gray-100 text-sm">
+                        <!-- Rows injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <div id="settings" class="tab-content">
+            <h2 class="text-2xl font-bold mb-6">系统设置</h2>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8 max-w-2xl">
+                <form id="settingsForm" onsubmit="saveSettings(event)">
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">发帖审核</label>
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="setting-audit_required" class="w-5 h-5 text-orange-600 rounded focus:ring-orange-500 border-gray-300">
+                            <span class="text-gray-600">开启发帖审核（开启后新帖需后台通过才显示）</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">分享标题模板</label>
+                        <input type="text" id="setting-share_title_template" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="例如：【$状态】$地点 $描述">
+                        <p class="text-xs text-gray-500 mt-2">可用变量: $状态, $地点, $描述</p>
+                    </div>
+
+                    <button type="submit" class="bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700 transition font-medium">保存设置</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-xl max-w-2xl w-full m-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-4">
+                    <h3 class="text-xl font-bold">详情信息</h3>
+                    <button onclick="closeDetailModal()" class="text-gray-400 hover:text-gray-600">✕</button>
+                </div>
+                <div id="detailContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auth Check
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = '/login';
+        }
+        const user = JSON.parse(localStorage.getItem('adminUser') || '{}');
+        document.getElementById('adminName').textContent = user.username || 'Admin';
+
+        // Toast Notification
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+            const icon = type === 'success' ? '✓' : '✕';
+            
+            toast.className = `${bgColor} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px] toast-enter`;
+            toast.innerHTML = `
+                <div class="w-6 h-6 bg-white bg-opacity-20 rounded-full flex items-center justify-center font-bold text-sm">${icon}</div>
+                <div class="font-medium">${message}</div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease-in';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Navigation
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            document.querySelectorAll('.nav-btn').forEach(el => {
+                if (el.dataset.tab === tabId) {
+                    el.classList.add('bg-orange-50', 'text-orange-600');
+                } else {
+                    el.classList.remove('bg-orange-50', 'text-orange-600');
+                }
+            });
+
+            if (tabId === 'dashboard') loadStats();
+            if (tabId === 'pets') loadPets();
+            if (tabId === 'dailies') loadDailies();
+            if (tabId === 'comments') loadComments();
+            if (tabId === 'users') loadUsers();
+            if (tabId === 'settings') loadSettings();
+        }
+
+        function logout() {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUser');
+            window.location.href = '/login';
+        }
+
+        // API Helpers
+        async function api(endpoint, options = {}) {
+            try {
+                const res = await fetch(`/api${endpoint}`, options);
+                return await res.json();
+            } catch (e) {
+                console.error(e);
+                return { success: false, code: 500, message: 'Network Error' };
+            }
+        }
+
+        // Dashboard
+        async function loadStats() {
+            const res = await api('/admin/stats');
+            if (res.success) {
+                document.getElementById('stat-totalPets').textContent = res.data.totalPets;
+                document.getElementById('stat-pendingAudits').textContent = res.data.pendingAudits;
+                document.getElementById('stat-rescuedPets').textContent = res.data.rescuedPets;
+                document.getElementById('stat-totalUsers').textContent = res.data.totalUsers;
+            }
+        }
+
+        // Pets
+        async function loadPets() {
+            const tbody = document.getElementById('petsTableBody');
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center"><div class="inline-block loading-spinner"></div></td></tr>';
+            
+            const filter = document.getElementById('petFilter').value;
+            const res = await api('/pets');
+            tbody.innerHTML = '';
+
+            if (res.code === 200) {
+                let pets = res.data;
+                if (filter !== 'all') {
+                    if (filter === 'PENDING') pets = pets.filter(p => p.auditStatus === 'PENDING');
+                    if (filter === 'APPROVED') pets = pets.filter(p => p.auditStatus === 'APPROVED');
+                    if (filter === 'REJECTED') pets = pets.filter(p => p.auditStatus === 'REJECTED');
+                }
+
+                if (pets.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">暂无数据</td></tr>';
+                    return;
+                }
+
+                pets.forEach(pet => {
+                    const tr = document.createElement('tr');
+                    const img = pet.images && pet.images.length > 0 ? pet.images[0] : 'https://placehold.co/100';
+                    const statusBadge = pet.status === 'RESCUED' 
+                        ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">已救助</span>' 
+                        : '<span class="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs">求助中</span>';
+                    
+                    let auditBadge = '';
+                    if (pet.auditStatus === 'PENDING') auditBadge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs">待审核</span>';
+                    else if (pet.auditStatus === 'APPROVED') auditBadge = '<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">已通过</span>';
+                    else if (pet.auditStatus === 'REJECTED') auditBadge = '<span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">已拒绝</span>';
+                    else auditBadge = '<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">未知</span>';
+
+                    tr.innerHTML = `
+                        <td class="px-6 py-4"><img src="${img}" class="w-16 h-16 object-cover rounded-lg bg-gray-100 cursor-pointer" onclick="showDetail('${pet.id}')"></td>
+                        <td class="px-6 py-4">
+                            <div class="font-medium text-gray-900 truncate w-48" title="${pet.description}">${pet.description || '无描述'}</div>
+                            <div class="text-xs text-gray-500 mt-1">📍 ${pet.address || '未知位置'}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <img src="${pet.reporterAvatar || 'https://placehold.co/30'}" class="w-6 h-6 rounded-full">
+                                <span class="text-xs">${pet.reporterName || '匿名'}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">${statusBadge}</td>
+                        <td class="px-6 py-4">${auditBadge}</td>
+                        <td class="px-6 py-4">
+                            <div class="flex gap-2">
+                                ${pet.auditStatus === 'PENDING' ? `
+                                <button onclick="auditPet('${pet.id}', 'APPROVED')" class="text-green-600 hover:text-green-800 text-xs font-medium">通过</button>
+                                <button onclick="auditPet('${pet.id}', 'REJECTED')" class="text-red-600 hover:text-red-800 text-xs font-medium">拒绝</button>
+                                ` : ''}
+                                <button onclick="deletePet('${pet.id}')" class="text-gray-400 hover:text-red-600 text-xs">删除</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                showToast('加载失败: ' + res.message, 'error');
+            }
+        }
+
+        // Dailies
+        let dailiesData = [];
+
+        async function loadDailies() {
+            const tbody = document.getElementById('dailiesTableBody');
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center"><div class="inline-block loading-spinner"></div></td></tr>';
+            
+            const res = await api('/admin/dailies');
+            tbody.innerHTML = '';
+
+            if (res.success) {
+                dailiesData = res.data;
+                if (res.data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">暂无数据</td></tr>';
+                    return;
+                }
+
+                res.data.forEach(daily => {
+                    const tr = document.createElement('tr');
+                    
+                    let dailyImg = '';
+                    try {
+                        let imgs = daily.images;
+                        if (typeof imgs === 'string') {
+                            imgs = JSON.parse(imgs || '[]');
+                        }
+                        if (Array.isArray(imgs) && imgs.length > 0) dailyImg = imgs[0];
+                    } catch (e) {}
+                    
+                    const imgHtml = dailyImg ? `<img src="${dailyImg}" class="w-10 h-10 rounded object-cover bg-gray-100 cursor-pointer" onclick="showDailyDetail('${daily.id}')">` : '<div class="w-10 h-10 rounded bg-gray-100 flex items-center justify-center text-gray-400 text-xs">无图</div>';
+
+                    tr.innerHTML = `
+                        <td class="px-6 py-4">${imgHtml}</td>
+                        <td class="px-6 py-4">
+                            <div class="font-medium text-gray-900 truncate w-64" title="${daily.content}">${daily.content}</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${daily.petDescription || '未知救助信息'}</td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${daily.authorName || '匿名'}</td>
+                        <td class="px-6 py-4 text-xs text-gray-500">${new Date(daily.createdAt).toLocaleString()}</td>
+                        <td class="px-6 py-4">
+                            <button onclick="deleteDaily('${daily.id}')" class="text-gray-400 hover:text-red-600 text-xs">删除</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                showToast('加载失败: ' + res.message, 'error');
+            }
+        }
+
+        window.showDailyDetail = (id) => {
+            const daily = dailiesData.find(d => d.id == id);
+            if (!daily) return;
+
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('detailContent');
+            
+            let images = [];
+            try {
+                let imgs = daily.images;
+                if (typeof imgs === 'string') imgs = JSON.parse(imgs || '[]');
+                if (Array.isArray(imgs)) images = imgs;
+            } catch (e) {}
+
+            const imagesHtml = images.map(img => 
+                `<img src="${img}" class="w-full h-auto rounded-lg mb-2 bg-gray-50 border border-gray-100">`
+            ).join('');
+
+            content.innerHTML = `
+                <div class="grid grid-cols-1 gap-4 mb-4 max-h-96 overflow-y-auto">
+                    ${imagesHtml || '<div class="text-center text-gray-400 py-8">暂无图片</div>'}
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <div class="text-sm text-gray-500 mb-1">内容</div>
+                        <div class="text-gray-900 bg-gray-50 p-3 rounded-lg">${daily.content}</div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-sm text-gray-500 mb-1">关联救助信息</div>
+                            <div class="font-medium">${daily.petDescription || '未知'}</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500 mb-1">发布人</div>
+                            <div class="font-medium">${daily.authorName || '匿名'}</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-500 mb-1">发布时间</div>
+                            <div class="font-medium">${new Date(daily.createdAt).toLocaleString()}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        async function deleteDaily(id) {
+            if (!confirm('确定要删除这条日常吗？')) return;
+            const res = await fetch(`/api/admin/dailies/${id}`, { method: 'DELETE' });
+            const result = await res.json();
+            if (result.success) {
+                showToast('删除成功');
+                loadDailies();
+            } else {
+                showToast('删除失败', 'error');
+            }
+        }
+
+        // Comments
+        async function loadComments() {
+            const tbody = document.getElementById('commentsTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center"><div class="inline-block loading-spinner"></div></td></tr>';
+            
+            const res = await api('/admin/comments');
+            tbody.innerHTML = '';
+
+            if (res.success) {
+                if (res.data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">暂无数据</td></tr>';
+                    return;
+                }
+
+                res.data.forEach(comment => {
+                    const tr = document.createElement('tr');
+                    
+                    let dailyImg = '';
+                    try {
+                        let imgs = comment.dailyImages;
+                        if (typeof imgs === 'string') {
+                            imgs = JSON.parse(imgs || '[]');
+                        }
+                        if (Array.isArray(imgs) && imgs.length > 0) dailyImg = imgs[0];
+                    } catch (e) {
+                        console.error('Image parse error:', e);
+                    }
+
+                    const imgHtml = dailyImg ? `<img src="${dailyImg}" class="w-10 h-10 rounded object-cover bg-gray-100 flex-shrink-0">` : '<div class="w-10 h-10 rounded bg-gray-100 flex-shrink-0 flex items-center justify-center text-gray-400 text-xs">无图</div>';
+
+                    tr.innerHTML = `
+                        <td class="px-6 py-4">
+                            <div class="font-medium text-gray-900 truncate w-64" title="${comment.content}">${comment.content}</div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                ${imgHtml}
+                                <div class="min-w-0">
+                                    <div class="text-sm text-gray-900 font-medium truncate w-40" title="${comment.petDescription || '未知救助信息'}">${comment.petDescription || '未知救助信息'}</div>
+                                    <div class="text-xs text-gray-500 truncate w-40" title="${comment.dailyContent || '无内容'}">${comment.dailyContent || '无内容'}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">${comment.authorName || '匿名'}</td>
+                        <td class="px-6 py-4 text-xs text-gray-500">${new Date(comment.createdAt).toLocaleString()}</td>
+                        <td class="px-6 py-4">
+                            <button onclick="deleteComment('${comment.id}')" class="text-gray-400 hover:text-red-600 text-xs">删除</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                showToast('加载失败: ' + res.message, 'error');
+            }
+        }
+
+        async function deleteComment(id) {
+            if (!confirm('确定要删除这条评论吗？')) return;
+            const res = await fetch(`/api/admin/comments/${id}`, { method: 'DELETE' });
+            const result = await res.json();
+            if (result.success) {
+                showToast('删除成功');
+                loadComments();
+            } else {
+                showToast('删除失败', 'error');
+            }
+        }
+
+        async function auditPet(id, status) {
+            if (!confirm(`确定要${status === 'APPROVED' ? '通过' : '拒绝'}这条信息吗？`)) return;
+            try {
+                const res = await fetch(`/api/audits`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        petId: id, 
+                        status, 
+                        reason: '后台审核',
+                        reviewerName: user.username || 'Admin'
+                    })
+                });
+                const result = await res.json();
+                if (result.code === 200) {
+                    showToast('审核操作成功');
+                    loadPets();
+                    loadStats();
+                } else {
+                    showToast('操作失败: ' + result.message, 'error');
+                }
+            } catch (e) {
+                console.error(e);
+                showToast('操作失败', 'error');
+            }
+        }
+
+        async function deletePet(id) {
+            if (!confirm('确定要删除这条信息吗？此操作不可恢复。')) return;
+            try {
+                const res = await fetch(`/api/pets/${id}`, {
+                    method: 'DELETE'
+                });
+                const result = await res.json();
+                if (result.code === 200) {
+                    showToast('删除成功');
+                    loadPets();
+                    loadStats();
+                } else {
+                    showToast('删除失败: ' + result.message, 'error');
+                }
+            } catch (e) {
+                console.error(e);
+                showToast('删除失败', 'error');
+            }
+        }
+
+        // Users
+        async function loadUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center"><div class="inline-block loading-spinner"></div></td></tr>';
+            
+            const res = await api('/users');
+            tbody.innerHTML = '';
+            
+            if (res.code === 200) {
+                if (res.data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500">暂无用户</td></tr>';
+                    return;
+                }
+
+                res.data.forEach(user => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="px-6 py-4"><img src="${user.avatarUrl || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-full bg-gray-100"></td>
+                        <td class="px-6 py-4 font-medium">${user.nickname || '未命名'}</td>
+                        <td class="px-6 py-4 text-gray-500 font-mono text-xs">${user.openId}</td>
+                        <td class="px-6 py-4 text-gray-500 text-xs">${new Date(user.created_at).toLocaleString()}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                showToast('加载用户失败: ' + res.message, 'error');
+            }
+        }
+
+        // Settings
+        async function loadSettings() {
+            const res = await api('/admin/settings');
+            if (res.success) {
+                const settings = res.data;
+                document.getElementById('setting-audit_required').checked = settings.audit_required === 'true';
+                document.getElementById('setting-share_title_template').value = settings.share_title_template || '';
+            }
+        }
+
+        async function saveSettings(e) {
+            e.preventDefault();
+            const settings = {
+                audit_required: document.getElementById('setting-audit_required').checked ? 'true' : 'false',
+                share_title_template: document.getElementById('setting-share_title_template').value
+            };
+            
+            const res = await fetch('/api/admin/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ settings })
+            });
+            const result = await res.json();
+            if (result.success) {
+                showToast('设置已保存');
+            } else {
+                showToast('保存失败', 'error');
+            }
+        }
+
+        // Detail Modal
+        window.showDetail = async (id) => {
+            const res = await api(`/pets/${id}`);
+            if (res.code === 200) {
+                const pet = res.data;
+                const modal = document.getElementById('detailModal');
+                const content = document.getElementById('detailContent');
+                
+                const imagesHtml = (pet.images || []).map(img => 
+                    `<img src="${img}" class="w-full h-auto rounded-lg mb-2 bg-gray-50 border border-gray-100">`
+                ).join('');
+
+                content.innerHTML = `
+                    <div class="grid grid-cols-1 gap-4 mb-4 max-h-96 overflow-y-auto">
+                        ${imagesHtml}
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <span class="text-sm text-gray-500">描述</span>
+                            <p class="text-gray-800">${pet.description || '无'}</p>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-500">地址</span>
+                            <p class="text-gray-800">${pet.address || '无'}</p>
+                        </div>
+                        <div class="flex gap-4">
+                            <div>
+                                <span class="text-sm text-gray-500">状态</span>
+                                <p class="font-medium">${pet.status === 'RESCUED' ? '已救助' : '求助中'}</p>
+                            </div>
+                            <div>
+                                <span class="text-sm text-gray-500">审核状态</span>
+                                <p class="font-medium">${pet.auditStatus}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        };
+
+        window.closeDetailModal = () => {
+            const modal = document.getElementById('detailModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        };
+
+        // Init
+        switchTab('dashboard');
+
+    </script>
+</body>
+</html>
