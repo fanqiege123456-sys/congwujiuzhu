@@ -1,0 +1,56 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/detail/detail",
+    "pages/report/report",
+    "pages/list/list",
+    "pages/profile/profile",
+    "pages/stats/stats",
+    "pages/community/community",
+    "pages/inbox/inbox",
+    "pages/pet-dailies/pet-dailies",
+    "pages/post-detail/post-detail",
+    "pages/post-create/post-create"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "爱我猫动物救助",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#ffd1df",
+    "selectedColor": "#ffffff",
+    "backgroundColor": "#ff6b9d",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "地图"
+      },
+      {
+        "pagePath": "pages/list/list",
+        "text": "列表"
+      },
+      {
+        "pagePath": "pages/community/community",
+        "text": "社区"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "获取您的位置用于显示地图和查找附近的救助信息"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation",
+    "chooseLocation"
+  ],
+  "sitemapLocation": "sitemap.json"
+}
