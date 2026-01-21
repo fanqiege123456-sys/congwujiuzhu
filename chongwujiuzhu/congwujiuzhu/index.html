@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>流浪萌宠救助 - 爱心传递，温暖回家</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Custom scrollbar for webkit */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+      
+      /* Marquee Animation */
+      @keyframes marquee {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(-100%); }
+      }
+      .animate-marquee {
+        display: inline-block;
+        white-space: nowrap;
+        animation: marquee 25s linear infinite;
+        padding-left: 100%; /* Start fully off-screen */
+      }
+      
+      /* Custom styles */
+      .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), 
+                    url('https://images.unsplash.com/photo-1517849845537-4d257902454a?w=1200&h=600&fit=crop') center/cover;
+      }
+      .btn-primary {
+        @apply bg-red-500 hover:bg-red-600 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105;
+      }
+      .btn-secondary {
+        @apply bg-white hover:bg-gray-100 text-red-600 font-medium py-3 px-6 rounded-lg transition-all duration-300 border border-red-500;
+      }
+      .card {
+        @apply bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2;
+      }
+    </style>
+  </head>
+  <body class="font-sans text-gray-800 bg-gray-50">
+    <!-- 导航栏 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="bg-red-500 text-white p-2 rounded-lg">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
+            </svg>
+          </div>
+          <h1 class="text-xl font-bold text-slate-800">流浪萌宠救助</h1>
+        </div>
+        
+        <!-- 桌面导航 -->
+        <nav class="hidden md:flex items-center gap-8">
+          <a href="#home" class="text-gray-600 hover:text-red-500 font-medium transition-colors">首页</a>
+          <a href="#about" class="text-gray-600 hover:text-red-500 font-medium transition-colors">关于我们</a>
+          <a href="#services" class="text-gray-600 hover:text-red-500 font-medium transition-colors">服务项目</a>
+          <a href="#contact" class="text-gray-600 hover:text-red-500 font-medium transition-colors">联系方式</a>
+          <a href="/app" class="btn-primary">进入救助平台</a>
+        </nav>
+        
+        <!-- 移动端菜单按钮 -->
+        <button class="md:hidden text-gray-600 hover:text-red-500">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section id="home" class="hero-section text-white py-20 md:py-32">
+      <div class="container mx-auto px-4">
+        <div class="max-w-3xl">
+          <h2 class="text-3xl md:text-5xl font-bold mb-6 leading-tight">
+            爱心传递，温暖回家
+          </h2>
+          <p class="text-lg md:text-xl mb-8 text-gray-100">
+            我们致力于帮助流浪动物找到温暖的家，让每一个生命都能感受到爱与关怀。
+            加入我们，一起为流浪动物创造更美好的未来。
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a href="/app" class="btn-primary text-center">立即加入救助</a>
+            <a href="#about" class="btn-secondary text-center">了解更多</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 公告栏 -->
+    <div class="bg-orange-50 text-orange-800 text-sm py-3 overflow-hidden whitespace-nowrap border-b border-orange-100 flex items-center">
+      <div class="bg-orange-50 px-4 z-10 shrink-0">
+        <svg class="w-5 h-5 inline-block mr-2 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
+        </svg>
+      </div>
+      <div class="animate-marquee font-medium">
+        📢 最新公告：近日气温骤降，请大家留意车底或发动机舱内取暖的流浪小动物。感谢用户“爱心小王”刚刚上传了新的救助线索！若发现受伤动物请及时标记，紧急情况请联系当地救助站。
+      </div>
+    </div>
+
+    <!-- 关于我们 -->
+    <section id="about" class="py-16 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-800 mb-4">关于我们</h2>
+          <div class="w-20 h-1 bg-red-500 mx-auto"></div>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600&h=400&fit=crop" 
+                 alt="关于我们" class="rounded-xl shadow-lg w-full h-auto" />
+          </div>
+          <div>
+            <h3 class="text-2xl font-semibold mb-4 text-gray-800">我们的使命</h3>
+            <p class="text-gray-600 mb-4 leading-relaxed">
+              流浪萌宠救助平台成立于2024年，是一个致力于帮助流浪动物的公益组织。我们的使命是通过科技手段，连接爱心人士，为流浪动物提供救助、医疗和领养服务。
+            </p>
+            <p class="text-gray-600 mb-6 leading-relaxed">
+              我们相信每一个生命都值得被尊重和爱护，每一个流浪动物都应该有一个温暖的家。通过我们的平台，您可以轻松参与流浪动物救助，无论是上报发现的流浪动物，还是参与救助行动，或者领养一只可爱的宠物。
+            </p>
+            <div class="grid grid-cols-3 gap-4 text-center">
+              <div class="p-4 bg-gray-50 rounded-lg">
+                <div class="text-3xl font-bold text-red-500 mb-2">1000+</div>
+                <div class="text-gray-600">救助动物</div>
+              </div>
+              <div class="p-4 bg-gray-50 rounded-lg">
+                <div class="text-3xl font-bold text-red-500 mb-2">500+</div>
+                <div class="text-gray-600">成功领养</div>
+              </div>
+              <div class="p-4 bg-gray-50 rounded-lg">
+                <div class="text-3xl font-bold text-red-500 mb-2">2000+</div>
+                <div class="text-gray-600">爱心用户</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 服务项目 -->
+    <section id="services" class="py-16 bg-gray-50">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-800 mb-4">我们的服务</h2>
+          <div class="w-20 h-1 bg-red-500 mx-auto"></div>
+          <p class="text-gray-600 mt-4 max-w-3xl mx-auto">
+            我们提供全方位的流浪动物救助服务，从发现上报到救助领养，全程为您提供支持和帮助。
+          </p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- 服务卡片1 -->
+          <div class="card">
+            <div class="p-6">
+              <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
+                <svg class="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">流浪动物上报</h3>
+              <p class="text-gray-600 mb-4">
+                发现流浪动物？立即上报它们的位置和状况，我们将及时安排救助人员前往处理。
+              </p>
+              <a href="/app" class="text-red-500 font-medium hover:underline">了解更多 →</a>
+            </div>
+          </div>
+          
+          <!-- 服务卡片2 -->
+          <div class="card">
+            <div class="p-6">
+              <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
+                <svg class="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                  <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">救助行动支持</h3>
+              <p class="text-gray-600 mb-4">
+                提供专业的救助指导和支持，包括捕捉、运输、医疗等方面的帮助。
+              </p>
+              <a href="/app" class="text-red-500 font-medium hover:underline">了解更多 →</a>
+            </div>
+          </div>
+          
+          <!-- 服务卡片3 -->
+          <div class="card">
+            <div class="p-6">
+              <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
+                <svg class="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold mb-3">宠物领养服务</h3>
+              <p class="text-gray-600 mb-4">
+                为救助的流浪动物寻找合适的领养家庭，确保它们能够得到长期的关爱和照顾。
+              </p>
+              <a href="/app" class="text-red-500 font-medium hover:underline">了解更多 →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 统计数据 -->
+    <section class="py-16 bg-red-600 text-white">
+      <div class="container mx-auto px-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div>
+            <div class="text-4xl md:text-5xl font-bold mb-2">1,234</div>
+            <div class="text-red-100">救助动物数量</div>
+          </div>
+          <div>
+            <div class="text-4xl md:text-5xl font-bold mb-2">567</div>
+            <div class="text-red-100">成功领养</div>
+          </div>
+          <div>
+            <div class="text-4xl md:text-5xl font-bold mb-2">2,345</div>
+            <div class="text-red-100">爱心用户</div>
+          </div>
+          <div>
+            <div class="text-4xl md:text-5xl font-bold mb-2">89</div>
+            <div class="text-red-100">合作机构</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 联系方式 -->
+    <section id="contact" class="py-16 bg-white">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-800 mb-4">联系我们</h2>
+          <div class="w-20 h-1 bg-red-500 mx-auto"></div>
+          <p class="text-gray-600 mt-4 max-w-3xl mx-auto">
+            有任何问题或建议？欢迎随时联系我们，我们将尽快回复您。
+          </p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-12">
+          <!-- 联系信息 -->
+          <div>
+            <h3 class="text-xl font-semibold mb-6">联系信息</h3>
+            <div class="space-y-6">
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="font-medium text-gray-800 mb-1">地址</h4>
+                  <p class="text-gray-600">北京市朝阳区建国路88号</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="font-medium text-gray-800 mb-1">电话</h4>
+                  <p class="text-gray-600">400-123-4567</p>
+                </div>
+              </div>
+              
+              <div class="flex items-start gap-4">
+                <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h4 class="font-medium text-gray-800 mb-1">邮箱</h4>
+                  <p class="text-gray-600">contact@petrescue.com</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 社交媒体 -->
+            <div class="mt-10">
+              <h3 class="text-xl font-semibold mb-4">关注我们</h3>
+              <div class="flex gap-4">
+                <a href="#" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-red-100 hover:text-red-500 transition-colors">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5 5 0 100-10 5 5 0 000 10z" clip-rule="evenodd"></path>
+                  </svg>
+                </a>
+                <a href="#" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-red-100 hover:text-red-500 transition-colors">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5 5 0 100-10 5 5 0 000 10z" clip-rule="evenodd"></path>
+                  </svg>
+                </a>
+                <a href="#" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-red-100 hover:text-red-500 transition-colors">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5 5 0 100-10 5 5 0 000 10z" clip-rule="evenodd"></path>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 联系表单 -->
+          <div>
+            <h3 class="text-xl font-semibold mb-6">发送消息</h3>
+            <form class="space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
+                  <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="请输入您的姓名" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
+                  <input type="email" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="请输入您的邮箱" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">主题</label>
+                <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="请输入消息主题" />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">消息内容</label>
+                <textarea rows="5" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="请输入您的消息内容"></textarea>
+              </div>
+              <button type="submit" class="btn-primary w-full">发送消息</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-12">
+      <div class="container mx-auto px-4">
+        <div class="grid md:grid-cols-4 gap-8 mb-8">
+          <!-- 品牌信息 -->
+          <div>
+            <div class="flex items-center gap-3 mb-4">
+              <div class="bg-red-500 text-white p-2 rounded-lg">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
+                </svg>
+              </div>
+              <h2 class="text-lg font-bold">流浪萌宠救助</h2>
+            </div>
+            <p class="text-gray-400 mb-4">
+              我们致力于帮助流浪动物找到温暖的家，让每一个生命都能感受到爱与关怀。
+            </p>
+            <div class="flex gap-4">
+              <a href="#" class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5 5 0 100-10 5 5 0 000 10z" clip-rule="evenodd"></path>
+                </svg>
+              </a>
+              <a href="#" class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5 5 0 100-10 5 5 0 000 10z" clip-rule="evenodd"></path>
+                </svg>
+              </a>
+              <a href="#" class="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-red-500 transition-colors">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5 5 0 100-10 5 5 0 000 10z" clip-rule="evenodd"></path>
+                </svg>
+              </a>
+            </div>
+          </div>
+          
+          <!-- 快速链接 -->
+          <div>
+            <h3 class="text-lg font-semibold mb-4">快速链接</h3>
+            <ul class="space-y-2">
+              <li><a href="#home" class="text-gray-400 hover:text-red-500 transition-colors">首页</a></li>
+              <li><a href="#about" class="text-gray-400 hover:text-red-500 transition-colors">关于我们</a></li>
+              <li><a href="#services" class="text-gray-400 hover:text-red-500 transition-colors">服务项目</a></li>
+              <li><a href="#contact" class="text-gray-400 hover:text-red-500 transition-colors">联系方式</a></li>
+              <li><a href="/app" class="text-gray-400 hover:text-red-500 transition-colors">进入救助平台</a></li>
+            </ul>
+          </div>
+          
+          <!-- 服务 -->
+          <div>
+            <h3 class="text-lg font-semibold mb-4">我们的服务</h3>
+            <ul class="space-y-2">
+              <li><a href="#" class="text-gray-400 hover:text-red-500 transition-colors">流浪动物上报</a></li>
+              <li><a href="#" class="text-gray-400 hover:text-red-500 transition-colors">救助行动支持</a></li>
+              <li><a href="#" class="text-gray-400 hover:text-red-500 transition-colors">宠物领养服务</a></li>
+              <li><a href="#" class="text-gray-400 hover:text-red-500 transition-colors">医疗救助支持</a></li>
+              <li><a href="#" class="text-gray-400 hover:text-red-500 transition-colors">志愿者招募</a></li>
+            </ul>
+          </div>
+          
+          <!-- 联系信息 -->
+          <div>
+            <h3 class="text-lg font-semibold mb-4">联系我们</h3>
+            <ul class="space-y-3">
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-gray-400">北京市朝阳区建国路88号</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"></path>
+                </svg>
+                <span class="text-gray-400">400-123-4567</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-gray-400">contact@petrescue.com</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="border-t border-gray-700 pt-8 text-center text-gray-400 text-sm">
+          <p>© 2024 流浪萌宠救助平台. 保留所有权利.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- 返回顶部按钮 -->
+    <button id="backToTop" class="fixed bottom-6 right-6 w-12 h-12 bg-red-500 text-white rounded-full shadow-lg flex items-center justify-center opacity-0 invisible transition-all duration-300 hover:bg-red-600 hover:scale-110 z-50">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+      </svg>
+    </button>
+
+    <!-- JavaScript -->
+    <script>
+      // 返回顶部功能
+      const backToTopButton = document.getElementById('backToTop');
+      window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+          backToTopButton.classList.remove('opacity-0', 'invisible');
+          backToTopButton.classList.add('opacity-100', 'visible');
+        } else {
+          backToTopButton.classList.add('opacity-0', 'invisible');
+          backToTopButton.classList.remove('opacity-100', 'visible');
+        }
+      });
+      backToTopButton.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    </script>
+  </body>
+</html>
